@@ -1,6 +1,6 @@
 {
     "name": "InstanceBasedLoot",
-    "version_number": "1.1.0",
+    "version_number": "1.0.0",
     "website_url": "https://github.com/programit/RoR2InstanceLootPlugin",
     "description": "This plugin is used to provide instance based loot when you're running with \"Artifact of Sacrifice\" and \"Artifact of Command\" enabled. Adds a console command drop_rate <value> to set a custom drop rate for items Adds a shortcut F3 to pull all unpicked items to you",
     "dependencies": [
