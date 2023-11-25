@@ -54,7 +54,8 @@ namespace InstanceLootPlugin
             Log.Init(Logger);
         }
 
-        public static float dropChance = 100;
+        // Matches current default drop rate
+        public static float dropChance = 5;
 
         private void Update()
         {
