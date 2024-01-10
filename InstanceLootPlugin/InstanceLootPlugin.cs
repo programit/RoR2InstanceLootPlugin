@@ -333,10 +333,7 @@ namespace InstanceLootPlugin
             if (interactableObject.name.StartsWith("CommandCube"))
             {
                 var picker = interactableObject.GetComponent<PickupPickerController>();
-                picker.panelInstance = UnityEngine.Object.Instantiate<GameObject>(picker.panelPrefab, ((MPEventSystem)EventSystem.current).localUser.cameraRigController.hud.mainContainer.transform);
-                picker.panelInstanceController = picker.panelInstance.GetComponent<PickupPickerPanel>();
-                picker.panelInstanceController.pickerController = picker;
-                picker.panelInstanceController.SetPickupOptions(picker.options);
+                picker.OnDisplayBegin(null, null, ((MPEventSystem)EventSystem.current).localUser.cameraRigController);
             }
             else
             {
