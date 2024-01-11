@@ -12,6 +12,10 @@ This plugin is used to provide instance based loot when you're running with "Art
 
 ## Changelog
 
+### 2.0.1
+
+- Fix compatibility with CommandQueue mod
+
 ### 2.0.0
 
 #### Fixes
