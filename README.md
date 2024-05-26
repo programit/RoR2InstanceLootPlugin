@@ -11,6 +11,9 @@ This plugin is used to provide instance based loot when you're running with "Art
 - Adds a console command `drop_rate_report` to view drop rate statistics for your run in the debugging window.
 
 ## Changelog
+### 2.1.0
+
+- Fix compatibility after Devotion update
 
 ### 2.0.1
 
