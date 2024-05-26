@@ -11,6 +11,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using static HG.Reflection.SearchableAttribute;
+using static RoR2.GenericPickupController;
 
 [assembly: OptIn]
 
@@ -49,7 +50,7 @@ namespace InstanceLootPlugin
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "programit";
         public const string PluginName = "InstanceBasedLoot";
-        public const string PluginVersion = "2.0.0";
+        public const string PluginVersion = "2.1.0";
         private static ConfigEntry<float> DropChanceMultiplier { get; set; }
         private static ConfigEntry<float> MinimumDropChance { get; set; }
         private static ConfigEntry<float> BaseDropChance { get; set; }
@@ -267,7 +268,7 @@ namespace InstanceLootPlugin
             On.RoR2.Networking.NetworkMessageHandlerAttribute.RegisterClientMessages += NetworkMessageHandlerAttribute_RegisterClientMessages;
 
             // Hooks pickup creation to control drop on client
-            On.RoR2.Artifacts.CommandArtifactManager.OnDropletHitGroundServer += CommandArtifactManager_OnDropletHitGroundServer;
+            On.RoR2.PickupDropletController.CreateCommandCube += PickupDropletController_CreateCommandCube; ;
 
             // Hook interaction since we didn't generate a real network object
             On.RoR2.Interactor.AttemptInteraction += Interactor_AttemptInteraction;
@@ -287,7 +288,7 @@ namespace InstanceLootPlugin
 
             On.RoR2.Util.GetExpAdjustedDropChancePercent -= Util_GetExpAdjustedDropChancePercent;
             On.RoR2.Networking.NetworkMessageHandlerAttribute.RegisterClientMessages -= NetworkMessageHandlerAttribute_RegisterClientMessages;
-            On.RoR2.Artifacts.CommandArtifactManager.OnDropletHitGroundServer -= CommandArtifactManager_OnDropletHitGroundServer;
+            On.RoR2.PickupDropletController.CreateCommandCube -= PickupDropletController_CreateCommandCube;
             On.RoR2.Interactor.AttemptInteraction -= Interactor_AttemptInteraction;
             On.RoR2.PickupPickerController.SubmitChoice -= PickupPickerController_SubmitChoice;
             On.RoR2.GenericPickupController.CreatePickup -= GenericPickupController_CreatePickup;
@@ -341,12 +342,11 @@ namespace InstanceLootPlugin
             }
         }
 
-        private void CommandArtifactManager_OnDropletHitGroundServer(On.RoR2.Artifacts.CommandArtifactManager.orig_OnDropletHitGroundServer orig, ref GenericPickupController.CreatePickupInfo createPickupInfo, ref bool shouldSpawn)
+        private void PickupDropletController_CreateCommandCube(On.RoR2.PickupDropletController.orig_CreateCommandCube orig, PickupDropletController self)
         {
-            DropRateTracker.RegisterItemDrop(createPickupInfo);
+            DropRateTracker.RegisterItemDrop(self.createPickupInfo);
 
-            NetworkServer.SendToAll(969, new SpawnCustomMessage() { position = createPickupInfo.position, pickupIndex = createPickupInfo.pickupIndex });
-            shouldSpawn = false;
+            NetworkServer.SendToAll(969, new SpawnCustomMessage() { position = self.createPickupInfo.position, pickupIndex = self.createPickupInfo.pickupIndex });
         }
 
         /// <summary>
