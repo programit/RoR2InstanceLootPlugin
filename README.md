@@ -9,8 +9,14 @@ This plugin is used to provide instance based loot when you're running with "Art
 - Adds a shortcut `F3` to pull all unpicked items to you.
 - Adds a console command `drop_rate <value>` to set a custom drop rate for items (0-100).
 - Adds a console command `drop_rate_report` to view drop rate statistics for your run in the debugging window.
+- Adds a console command `instance_loot_hotkey` that can be used to change the default hotkey
 
 ## Changelog
+### 2.2.0
+
+- Add configurable hotkey management for pulling items to you through a new console command `instance_loot_hotkey`
+- Update packages
+
 ### 2.1.0
 
 - Fix compatibility after Devotion update
