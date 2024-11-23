@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using BepInEx;
 using BepInEx.Configuration;
 using R2API;
@@ -50,13 +51,14 @@ namespace InstanceLootPlugin
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "programit";
         public const string PluginName = "InstanceBasedLoot";
-        public const string PluginVersion = "2.1.0";
+        public const string PluginVersion = "2.2.0";
         private static ConfigEntry<float> DropChanceMultiplier { get; set; }
         private static ConfigEntry<float> MinimumDropChance { get; set; }
         private static ConfigEntry<float> BaseDropChance { get; set; }
         private static ConfigEntry<bool> EnablePlayerDropRateScaling { get; set; }
         private static ConfigEntry<bool> EnableSwarmsScaling { get; set; }
         private static ConfigEntry<bool> EnableBadLuckProtection { get; set; }
+        private static ConfigEntry<KeyCode> PullItemsHotKey { get; set; }
 
         // Matches current default drop rate. Differs from BaseDropChance because we override it for player scaling.
         public static float dropChance = 5;
@@ -116,6 +118,13 @@ namespace InstanceLootPlugin
                 "Enabling this will increase drop rate consistency with low drop rates."
             );
 
+            PullItemsHotKey = base.Config.Bind<KeyCode>(
+                "General",
+                "PullItemsHotkey",
+                KeyCode.F3,
+                "Hotkey to use to pull items to yourself."
+            );
+
             BaseDropChance = base.Config.Bind<float>(
                 "General",
                 "BaseDropChance",
@@ -130,12 +139,14 @@ namespace InstanceLootPlugin
                 DropChanceMultiplier,
                 BaseDropChance,
                 MinimumDropChance);
+
+            Log.Info("InstanceLootPlugin loaded");
         }
 
         private void Update()
         {
             // Pulls all items on map to you.
-            if (Input.GetKeyDown(KeyCode.F3) && IsModHooked)
+            if (Input.GetKeyDown(InstanceLootPlugin.PullItemsHotKey.Value) && IsModHooked)
             {
                 try
                 {
@@ -391,6 +402,7 @@ namespace InstanceLootPlugin
         {
             dropChance = args.GetArgFloat(0);
             useManualDropRate = true;
+            Log.Info("Drop rate set to: " + args.GetArgString(0) + "%");
         }
 
         [ConCommand(commandName = "drop_rate_report", flags = ConVarFlags.ExecuteOnServer, helpText = "View Drop Rate Report")]
@@ -407,6 +419,24 @@ namespace InstanceLootPlugin
             return RunArtifactManager.instance is not null
                    && RunArtifactManager.instance.isActiveAndEnabled
                    && RunArtifactManager.instance.IsArtifactEnabled(RoR2Content.Artifacts.sacrificeArtifactDef);
+        }
+
+        [ConCommand(commandName = "instance_loot_hotkey", flags = ConVarFlags.ExecuteOnServer, helpText = "Set hotkey for pulling items to you")]
+        private static void CCSetHotkey(ConCommandArgs args)
+        {
+            if (IsModHooked)
+            {
+                var key = args.GetArgString(0);
+
+                if (Enum.TryParse(key, true, out KeyCode keyCode))
+                {
+                    InstanceLootPlugin.PullItemsHotKey.Value = keyCode;
+                }
+                else
+                {
+                    Log.Warning($"Failed to set hotkey to {key}");
+                }
+            }
         }
 
         private static bool IsCommandEnabled()
